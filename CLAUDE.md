@@ -152,7 +152,7 @@ Write tests for:
 #### 1. Analysis & Planning Phase
 - Think harder to analyze the problem/requirement thoroughly by reading all relevant context
 - Review the codebase to identify affected components and dependencies
-- Create a phased implementation plan in `task/phase_{phase_number}_{feature_name}.md`
+- Create a phased implementation plan in `task/{feature_name}.md`
 - Before you begin working, check it with me and I will verify the plan
 
 ##### 1.1 Plan Structure Requirements
@@ -209,7 +209,7 @@ Before marking any phase complete, ensure:
 
 #### 3. Documentation & Knowledge Transfer Phase
 
-Create `task/phase_{phase_number}_{feature_name}_summary.md` containing:
+Create `task/{feature_name}_summary.md` containing:
 
 - Overview: High-level summary of what was built
 - Architecture decisions: Why specific approaches were chosen
@@ -246,9 +246,13 @@ Follow each one of the Workflow Phases
 
 **IMPORTANT**:  Documentation & Knowledge Transfer task should be run by independent sub-agents.
 
-**REMEMBER**: The goal is to deliver high-quality, maintainable, and secure code. When in doubt, choose the simpler, more explicit solution. Always prioritize code clarity, readability and system stability over cleverness or premature optimization.
+**REMEMBER**: The goal is to deliver high-quality, maintainable, and secure code. When in doubt, choose the simpler, more explicit solution. Always prioritize code clarity, readability and system stability over cleverness or premature optimization. Good code is code that another developer (or future you) can understand and modify easily.
 
-**REMEMBER**: Good code is code that another developer (or future you) can understand and modify easily.
+**REMEMBER**: Do not forget to:
+1. After I confirm you the plan, create the related file `task/{feature_name}.md`
+2. Ask me if I want to proceed again
+3. Checks the completed tasks
+4. After the implementation ends, create the file `task/{feature_name}_summmary.md`
 
 ### Research Protocol
 
