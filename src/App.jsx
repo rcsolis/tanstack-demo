@@ -8,8 +8,20 @@ import {
   QueryClientProvider
 } from '@tanstack/react-query'
 import { PokemonList } from './components/PokemonList'
+import { QueryErrorBoundary } from './components/ErrorBoundary'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+  },
+})
 
 function App() {
 
@@ -30,7 +42,9 @@ function App() {
               <img src={reactLogo} className="logo react" alt="React logo" />
             </div>
           </div>
-          <PokemonList />
+          <QueryErrorBoundary>
+            <PokemonList />
+          </QueryErrorBoundary>
         </div>
       <ReactQueryDevtools initialIsOpen={true} client={queryClient}/>
       </QueryClientProvider>

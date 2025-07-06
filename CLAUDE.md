@@ -11,6 +11,37 @@ yarn build    # Build for production
 yarn test     # Run tests
 yarn lint     # Run linting
 ```
+## General Guidelines to follow
+
+Do not forget to create or update the plan and summary files:
+1. After I confirm you the plan, create the related file `task/{feature_name}.md`
+2. Ask me if I want to proceed with the implementation again
+3. Marks all the work done in the plan
+4. After the implementation ends, create the file `task/{feature_name}_summmary.md`
+**IMPORTANT**: The tests should be run (spin up) by independent **sub-agent**.
+
+**IMPORTANT**: If you need more information when you are thinking or write code, use context7 to  look for documentation and references.
+
+**IMPORTANT**:  Documentation & Knowledge Transfer task should be run (spin up) by independent **sub-agent**.
+
+**REMEMBER**: The goal is to deliver high-quality, maintainable, and secure code. When in doubt, choose the simpler, more explicit solution. Always prioritize code clarity, readability and system stability over cleverness or premature optimization. Good code is code that another developer (or future you) can understand and modify easily.
+
+**REMEMBER**: 
+
+### Research Protocol
+
+Use context7 proactively for:
+- API documentation and usage examples
+- Best practices for the technology stack
+- Similar implementations or patterns
+- Known issues, gotchas, or compatibility concerns
+- Performance optimization techniques
+- Security vulnerability databases
+
+### Emergency Protocols
+- If you encounter a critical security issue: **STOP** and report immediately
+- If you discover data corruption risk: **STOP** and create backup plan
+- If performance degradation >50%: Rollback and reassess approach
 
 ## Architecture Overview
 
@@ -126,7 +157,7 @@ Write tests for:
     - Unit tests for individual functions/methods
     - Integration tests for component interactions
     - End-to-end tests for critical user flows
-- Run tests via independent sub-agents to ensure objectivity
+- Run (spin up) tests via independent **sub-agents** to ensure objectivity
 - Maximum 4 fix attempts before escalating
 - **Test suite is immutable once written** - never modify tests to make code pass
 - If tests fail after 4 attempts:
@@ -147,7 +178,7 @@ Write tests for:
 - [ ] No eval() or dangerouslySetInnerHTML without sanitization
 - [ ] Review error messages to ensure no sensitive info leakage
 
-### Workflow Phases
+### Development Workflow
 
 #### 1. Analysis & Planning Phase
 - Think harder to analyze the problem/requirement thoroughly by reading all relevant context
@@ -176,13 +207,13 @@ Include:
 - Rationale for chosen approach
 - Alternative approaches considered and why they were rejected
 - Timeline estimates
-- Resource requirements (sub-agents, external dependencies)
+- Resource requirements (**sub-agents**, external dependencies)
 
 #### 2. Implementation Phase
 
 ##### 2.1 Implementation Guidelines
 - Execute phases sequentially, updating task checkboxes as you progress
-- Parallelize independent tasks using sub-agents when possible
+- Parallelize independent tasks when possible via spin up **sub-agents** with a maximun of 4
 - If blocked, document the blocker and move to next independent task
 - We want to avoid making any massive or complex changes. Every change should impact as little code as possible.Everything is about simplicity
 - Please in every step of the way just give me a high-level explanation of the changes you made at each step of the process
@@ -225,49 +256,6 @@ Create `task/{feature_name}_summary.md` containing:
 
 Act like you’re a senior engineer teaching me code and add any other relevant information.
 
-### Workflow types
-
-Identify if the work you are going to do is **SIMPLE** (like bug fix or small features/changes) or is **COMPLEX** (like new or complex feature) and then follow the right workflow.
-
-### Workflow For Simple Changes (like bug fixes or small features)
-1. Identify the issue and affected files
-2. Make a brief plan with the minimal necessary changes
-3. Follow the . Implementation Guidelines of the workflow phases
-4. Follow the 3. Documentation & Knowledge Transfer of the workflow phases
-
-### Workflow For Complex Changes (like complex requirement or new feature)
-Follow each one of the Workflow Phases
-
-## General Guidelines
-
-**IMPORTANT**: The tests should be run by independent sub-agents.
-
-**IMPORTANT**: If you need more information when you are thinking or write code, use context7 to  look for documentation and references.
-
-**IMPORTANT**:  Documentation & Knowledge Transfer task should be run by independent sub-agents.
-
-**REMEMBER**: The goal is to deliver high-quality, maintainable, and secure code. When in doubt, choose the simpler, more explicit solution. Always prioritize code clarity, readability and system stability over cleverness or premature optimization. Good code is code that another developer (or future you) can understand and modify easily.
-
-**REMEMBER**: Do not forget to create or update the plan and summary files:
-1. After I confirm you the plan, create the related file `task/{feature_name}.md`
-2. Ask me if I want to proceed with the implementation again
-3. Marks all the work done in the plan
-4. After the implementation ends, create the file `task/{feature_name}_summmary.md`
-
-### Research Protocol
-
-Use context7 proactively for:
-- API documentation and usage examples
-- Best practices for the technology stack
-- Similar implementations or patterns
-- Known issues, gotchas, or compatibility concerns
-- Performance optimization techniques
-- Security vulnerability databases
-
-### Emergency Protocols
-- If you encounter a critical security issue: **STOP** and report immediately
-- If you discover data corruption risk: **STOP** and create backup plan
-- If performance degradation >50%: Rollback and reassess approach
 
 ## API Reference
 

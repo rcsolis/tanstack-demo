@@ -1,59 +1,63 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { usePokemonStore } from '../../store/pokemonStore';
-import { fetchPokemons, generateFirstPageUrl, generateLastPageUrl } from '../../service/pokemonService';
+import { usePokemonListWithDetails, usePrefetchPokemon } from '../../hooks/usePokemon';
 import { Text } from '../atoms/Text';
 import { PaginationControls } from '../molecules/PaginationControls';
 import { PokemonGrid } from './PokemonGrid';
 
 export function PokemonListContainer() {
-  const [url, setUrl] = useState('https://pokeapi.co/api/v2/pokemon?offset=0&limit=20');
   const { 
-    pokemons, 
-    nextLink, 
-    previousLink, 
-    currentPage, 
-    totalPages, 
-    totalCount, 
-    setLinks, 
-    setPaginationInfo, 
-    addPokemon,
-    clearPokemons
+    currentOffset, 
+    limit, 
+    setCurrentOffset, 
+    goToNextPage, 
+    goToPrevPage, 
+    resetPagination
   } = usePokemonStore();
 
+  const { prefetchPokemonList } = usePrefetchPokemon();
+
+  // Fetch Pokemon list with details using the new hook
+  const { list, isLoading, error, combinedData } = usePokemonListWithDetails(
+    currentOffset, 
+    limit
+  );
+
+  // Prefetch next and previous pages for better UX
+  const pagination = list.data?.pagination;
+  if (pagination?.next) {
+    const nextOffset = currentOffset + limit;
+    prefetchPokemonList(nextOffset, limit);
+  }
+  if (pagination?.previous) {
+    const prevOffset = Math.max(0, currentOffset - limit);
+    prefetchPokemonList(prevOffset, limit);
+  }
+
   const handlePrevious = () => {
-    if (previousLink) {
-      clearPokemons();
-      setUrl(previousLink);
+    if (pagination?.previous) {
+      goToPrevPage();
     }
   };
 
   const handleNext = () => {
-    if (nextLink) {
-      clearPokemons();
-      setUrl(nextLink);
+    if (pagination?.next) {
+      goToNextPage();
     }
   };
 
   const handleFirst = () => {
-    clearPokemons();
-    setUrl(generateFirstPageUrl());
+    resetPagination();
   };
 
   const handleLast = () => {
-    if (totalCount > 0) {
-      clearPokemons();
-      setUrl(generateLastPageUrl(totalCount));
+    if (pagination?.count > 0) {
+      const lastOffset = Math.floor((pagination.count - 1) / limit) * limit;
+      setCurrentOffset(lastOffset);
     }
   };
 
-  const query = useQuery({
-    queryKey: ['pokemons', url],
-    queryFn: () => fetchPokemons(url, addPokemon, setLinks, setPaginationInfo),
-  });
-
   const handleRetry = () => {
-    query.refetch();
+    list.refetch();
   };
 
   return (
@@ -68,17 +72,17 @@ export function PokemonListContainer() {
           onNext={handleNext}
           onFirst={handleFirst}
           onLast={handleLast}
-          hasPrevious={!!previousLink}
-          hasNext={!!nextLink}
-          currentPage={currentPage}
-          totalPages={totalPages}
+          hasPrevious={!!pagination?.previous}
+          hasNext={!!pagination?.next}
+          currentPage={pagination?.currentPage || 1}
+          totalPages={pagination?.totalPages || 1}
         />
       </div>
       
       <PokemonGrid
-        pokemons={pokemons}
-        loading={query.isLoading}
-        error={query.error}
+        pokemons={combinedData}
+        loading={isLoading}
+        error={error}
         onRetry={handleRetry}
       />
     </div>

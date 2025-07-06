@@ -1,17 +1,56 @@
 import {create} from 'zustand';
 
-
-export const usePokemonStore = create((set) => ({
-  pokemons: [],
-  previousLink: null,
-  nextLink: null,
-  currentPage: 1,
-  totalPages: 0,
-  totalCount: 0,
+/**
+ * Pokemon UI Store - Only contains client-side UI state
+ * Server state is managed by TanStack Query
+ */
+export const usePokemonStore = create((set, get) => ({
+  // UI State - Filters and preferences
+  searchQuery: '',
+  selectedType: '',
+  sortBy: 'id',
+  sortOrder: 'asc',
+  viewMode: 'grid', // 'grid' or 'list'
+  
+  // Pagination UI State
+  currentOffset: 0,
   limit: 20,
-  setLinks: (previousLink, nextLink) => set({ previousLink, nextLink }),
-  setPaginationInfo: (currentPage, totalPages, totalCount) => set({ currentPage, totalPages, totalCount }),
-  addPokemon: (pokemon) => set((state) => ({ pokemons: [...state.pokemons, pokemon] })),
-  removePokemon: (pokemon) => set((state) => ({ pokemons: state.pokemons.filter((p) => p !== pokemon) })),
-  clearPokemons: () => set({ pokemons: [], currentPage: 1, totalPages: 0, totalCount: 0 }),
+  
+  // Favorites (could be persisted to localStorage)
+  favorites: [],
+  
+  // UI Actions
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setSelectedType: (type) => set({ selectedType: type }),
+  setSortBy: (sortBy) => set({ sortBy }),
+  setSortOrder: (order) => set({ sortOrder: order }),
+  setViewMode: (mode) => set({ viewMode: mode }),
+  
+  // Pagination Actions
+  setCurrentOffset: (offset) => set({ currentOffset: offset }),
+  setLimit: (limit) => set({ limit }),
+  goToPage: (page) => set({ currentOffset: (page - 1) * get().limit }),
+  goToNextPage: () => set((state) => ({ currentOffset: state.currentOffset + state.limit })),
+  goToPrevPage: () => set((state) => ({ 
+    currentOffset: Math.max(0, state.currentOffset - state.limit) 
+  })),
+  
+  // Favorites Actions
+  addToFavorites: (pokemonId) => set((state) => ({
+    favorites: [...state.favorites, pokemonId]
+  })),
+  removeFromFavorites: (pokemonId) => set((state) => ({
+    favorites: state.favorites.filter(id => id !== pokemonId)
+  })),
+  isFavorite: (pokemonId) => get().favorites.includes(pokemonId),
+  
+  // Reset functions
+  resetFilters: () => set({ 
+    searchQuery: '',
+    selectedType: '',
+    sortBy: 'id',
+    sortOrder: 'asc',
+    currentOffset: 0
+  }),
+  resetPagination: () => set({ currentOffset: 0 }),
 }));
