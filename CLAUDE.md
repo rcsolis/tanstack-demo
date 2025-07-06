@@ -1,115 +1,274 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This document outlines the development process to be followed when implementing features or fixing issues in this codebase.
 
 ## Development Commands
 
 This project uses **yarn** as the package manager. Common commands:
-
 ```bash
-# Start development server
-yarn dev
-
-# Build for production
-yarn build
-
-# Run linting
-yarn lint
-
-# Preview production build
-yarn preview
+yarn dev      # Start development server
+yarn build    # Build for production
+yarn test     # Run tests
+yarn lint     # Run linting
 ```
 
 ## Architecture Overview
 
-This is a modern React application built with Vite, demonstrating a Pokemon listing app with the following key architectural patterns:
-
-### Core Technology Stack
-- **React 19.1.0** with functional components and hooks
-- **Vite 7.0.0** with React SWC plugin for fast development
-- **TanStack Query 5.81.5** for server state management and API caching
-- **Zustand 5.0.6** for lightweight client state management
-- **Tailwind CSS 4.1.11** for utility-first styling
+### Tech Stack
+- **React 19.1.0** - Functional components with hooks
+- **Vite 7.0.0** - Build tool with React SWC
+- **TanStack Query 5.81.5** - Server state management
+- **Zustand 5.0.6** - Client state management
+- **Tailwind CSS 4.1.11** - Utility-first styling
+- **Vitest** - Testing framework (if not present, use Jest)
 - **Iconify React** for icon components
 
 ### State Management Pattern
-The application uses a **hybrid state management approach**:
+1. **Server State (TanStack Query)**
+   - Manages all API data fetching and caching
+   - Use descriptive query keys: `['pokemon', id]` or `['pokemons', { page }]`
+   - Always handle loading, error, and success states
 
-1. **Server State**: TanStack Query manages API calls, caching, and background updates
-2. **Client State**: Zustand store (`src/store/pokemonStore.jsx`) manages local application state
-3. **Service Layer**: `src/service/pokemonService.jsx` acts as middleware between API and state
+2. **Client State (Zustand)**
+   - UI state only (modals, filters, user preferences)
+   - Never store API data in Zustand
+   - Keep stores small and focused
 
-**Important**: If the service layer updates the Zustand store directly and breaks typical separation of concerns, please consider refactoring to return data from services and update state in components.
+3. **Service Layer**
+   - Services return data, never update state directly
+   - Components decide how to handle returned data
+   - Always include error handling
 
 ### Component Architecture
-The project is structured with **atomic design principles** in mind:
-
+Follow atomic design when creating new components:
 ```
 src/components/
-├── PokemonList.jsx          # Main container component
-├── atoms/                   # (Prepared but empty)
-├── molecules/               # (Prepared but empty)
-├── organisms/               # (Prepared but empty)
-├── templates/               # (Prepared but empty)
-└── ui/                     # Current UI components
-    ├── Error.jsx           # Error display component
-    ├── Loading.jsx         # Loading state component
-    └── PokemonItem.jsx     # Individual Pokemon display
+├── atoms/       # Single-purpose elements (Button, Input, Icon)
+├── molecules/   # Simple combinations (SearchBar, PokemonCard)
+├── organisms/   # Complex sections (PokemonGrid, FilterPanel)
+├── templates/   # Page layouts
+└── pages/       # Route components
 ```
 
-### Data Flow
-1. Components trigger queries via TanStack Query `useQuery` hook
-2. Query executes service function (`fetchPokemons` or `fetchPokemonDetails`)
-3. Service fetches data from PokeAPI and updates Zustand store
-4. Components re-render based on Zustand state changes
+### Code Patterns
 
-### Key Patterns
-- **Query Key Strategy**: Uses static keys like `['pokemons']` for TanStack Query
-- **Error Handling**: Try-catch in services with dedicated Error UI component
-- **Loading States**: Conditional rendering with dedicated Loading component
-- **Pagination**: URL-based pagination with previous/next links from API
-- **KISS Principle**: It should be adopted to avoid unnecessary complexity and instead write code that is simple and clear.
-- **Clean Code**: Follow the principles of hexagonal architecture.
+#### Data Fetching Pattern
+```javascript
+// ✅ Good - Service returns data
+export const fetchPokemon = async (id) => {
+    try{
+        const response = await fetch(`${API_BASE}/pokemon/${id}`);
+        if (!response.ok) throw new Error('Pokemon not found');
+        return response.json();
+    }catch(e){
+        throw e;
+    }
+};
 
-### Development Notes
-- **ESLint Config**: Uses flat config with React hooks and refresh plugins
-- **Custom Rule**: Allows unused variables matching pattern `^_.*$`
-- **DevTools**: TanStack Query DevTools enabled in development
-- **Styling**: Primarily Tailwind CSS with minimal custom CSS for animations
+// Component uses the service
+const { data, isLoading, error } = useQuery({
+  queryKey: ['pokemon', id],
+  queryFn: () => fetchPokemon(id),
+});
+```
 
-### API Integration
-- **Base URL**: `https://pokeapi.co/api/v2/pokemon`
-- **Pagination**: Handled via API's `next` and `previous` links
-- **Data Transformation**: Service layer maps API responses to application data structures
-- **Error Handling**: Service layer throws errors that are caught by TanStack Query
+#### Error Handling
+- Always use error boundaries for critical errors
+- Use try-catch for expected errors
+- Display user-friendly error messages
+
+#### Performance Optimization
+- Use React.memo for expensive components
+- Implement virtual scrolling for large lists
+- Lazy load routes and heavy components
+- Optimize re-renders with proper dependency arrays
+- Use Zustand for store states
+
+#### Code Quality Principles
+- Minimize blast radius: Each change should affect the smallest possible scope
+- Prefer composition over modification: Add new code rather than changing existing code when possible
+- Keep it simple: Avoid clever solutions; optimize for readability and maintainability
+- Single Responsibility: Each function/class should do one thing well
+- No premature optimization: Make it work, make it right, then make it fast (if needed)
+
+## Development Workflow
+
+### Common Pitfalls to Avoid
+- ❌ Storing API data in Zustand
+- ❌ Using index as key in lists with dynamic items
+- ❌ Forgetting cleanup in useEffect
+- ❌ Making API calls inside render
+- ❌ Mutating state directly
+- ❌ Over-engineering simple features
 
 ### Common Patterns to Follow
 - Use functional components with hooks.
-- Implement conditional rendering for loading/error/success states.
-- Follow existing Tailwind CSS utility patterns.
 - Use named exports for components and functions.
 - Maintain separation between server state (TanStack Query) and client state (Zustand).
-- Use separation of concerns for the Service layer.
-- Prevent side effects or infinite calls of useEffect.
 - Use responsive design.
-- Use atomic design for create the UI.
-- Optimize the render process by use Suspese or Lazy loading strategies.
-- Prevent multiple renders.
 - Use ES modules (import/export) syntax, not CommonJS (require).
 - Destructure imports when possible (eg. import { foo } from 'bar').
 - Be sure to typecheck when you’re done making a series of code changes.
 - Prefer running single tests, and not the whole test suite, for performance.
 
-### Standard Workflow
-1. First, think deeply about the problem or requirement, read the codebase to find the relevant files, and write a plan to a file named with the following pattern `{phase_number}_phase.md` and save it into the `task` folder located at the root of the project.
-2. The plan must be break into phases, and each phase should have a list of todo items that you can check off as you complete them.
-3. Before you begin working, check it with me and I will verify the plan.
-4. Then, begin working on each phase of the plan one by one, checking off each of the todo items as you complete them. If you find tasks that aren't dependent, execute them with sub-agents.
-5. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
-6. Please in every step of the way just give me a high-level explanation of the changes you made at each step of the process.
-7. Please check through all the code you just wrote and make sure it follows security best practices. Make sure there are no sensitive information in the front and and there are no vulnerabilities that can be exploited.
-8. Finally, when you're done, create a file with the following pattern: `{phase_number}_summarize.md` with the explanation of the functionality and code you just built out in detail. Walk me through wehat you changed and how it works. Act like you’re a senior engineer teaching me code and add any other relevant information.
 
-**IMPORTANT**: Write tests based on the to-do list, if the written code does not pass the tests, change the code and continue until all tests pass with a maximum of 4 iterations, NEVER modify the test suite. The tests should be run by independent sub-agents.
+### Testing Guidelines
+Write tests for:
+- New components (at least render test)
+- Service functions (API calls, data transformations)
+- Custom hooks
+- Critical user flows
+
+### Testing Protocol
+- **Write tests BEFORE implementation** (Test-Driven Development)
+- Tests must cover all acceptance criteria from the plan
+- Test structure:
+    - Unit tests for individual functions/methods
+    - Integration tests for component interactions
+    - End-to-end tests for critical user flows
+- Run tests via independent sub-agents to ensure objectivity
+- Maximum 4 fix attempts before escalating
+- **Test suite is immutable once written** - never modify tests to make code pass
+- If tests fail after 4 attempts:
+    - Document what's failing and why
+    - Propose plan modification
+    - Seek approval before proceeding
+
+### Security Checklist
+- [ ] No API keys or secrets in frontend code
+- [ ] Validate and sanitize user inputs
+- [ ] Validate all external data before processing 
+- [ ] Apply principle of least privilege for all operations
+- [ ] Use HTTPS for all API calls
+- [ ] Implement proper CORS handling
+- [ ] Check for SQL injection, XSS, CSRF vulnerabilities
+- [ ] Use parameterized queries for database operations
+- [ ] Implement proper authentication and authorization checks
+- [ ] No eval() or dangerouslySetInnerHTML without sanitization
+- [ ] Review error messages to ensure no sensitive info leakage
+
+### Workflow Phases
+
+#### 1. Analysis & Planning Phase
+- Think harder to analyze the problem/requirement thoroughly by reading all relevant context
+- Review the codebase to identify affected components and dependencies
+- Create a phased implementation plan in task/{phase_number}_phase.md
+- Before you begin working, check it with me and I will verify the plan
+
+##### 1.1 Plan Structure Requirements
+- Break work into logical, atomic phases that can be completed independently
+- Structure your plan as follows:
+    - Problem statement (what we're solving and why)
+    - Phases (logical groupings of work)
+    - Tasks per phase (specific, actionable items)
+    - Success criteria (how we know when we're done)
+    - Risk assessment (what could go wrong and mitigation strategies)
+    - Rollback strategy for each phase
+- Each phase must contain:
+    - Checklist-style tasks that are testable and specific
+    - Dependencies clearly marked (e.g., "Requires: Phase 1 Task 3")
+    - Estimated complexity level (Low/Medium/High)
+    - Potential risks and mitigation strategies
+
+##### 1.2 Plan validation
+Present the complete plan to me for the approval before any implementation.
+Include:
+- Rationale for chosen approach
+- Alternative approaches considered and why they were rejected
+- Timeline estimates
+- Resource requirements (sub-agents, external dependencies)
+
+#### 2. Implementation Guidelines
+- Execute phases sequentially, updating task checkboxes as you progress
+- Parallelize independent tasks using sub-agents when possible
+- If blocked, document the blocker and move to next independent task
+- We want to avoid making any massive or complex changes. Every change should impact as little code as possible.Everything is about simplicity
+- Please in every step of the way just give me a high-level explanation of the changes you made at each step of the process
+- Please check through all the code you just wrote and make sure it follows security best practices
+- Make sure there are no sensitive information in the front and and there are no vulnerabilities that can be exploited
+- Flag any deviations from the original plan immediately with justification
+- If you discover additional work needed, update the phase plan before proceeding
+- Provide concise updates after each task completion:
+    - **What changed**: Specific files and functions modified
+    - **Why**: Business reason and technical rationale
+    - **Impact**: What this enables or fixes
+    - **Next steps**: What comes next in the plan
+
+##### 2.1 Quality Gates
+
+Before marking any phase complete, ensure:
+
+- All tests pass
+- Code review checklist complete
+- Documentation updated
+- Security scan clean
+- Performance benchmarks met
+- Stakeholder sign-off obtained
+
+#### 3. Documentation & Knowledge Transfer
+
+Create task/{phase_number}_summary.md containing:
+
+- Overview: High-level summary of what was built
+- Architecture decisions: Why specific approaches were chosen
+- Code walkthrough:
+    - Key files changed with explanations
+    - Important functions/classes added
+    - Usage examples
+- Configuration changes: Environment variables, dependencies, settings
+- Testing approach: What tests were written and why
+- Deployment notes: Any special deployment considerations
+- Lessons learned: What went well, what was challenging
+- Future considerations: Technical debt, optimization opportunities
+
+Act like you’re a senior engineer teaching me code and add any other relevant information.
+
+### Workflow types
+
+Identify if the work you are going to do is **SIMPLE** (like bug fix or small features/changes) or is **COMPLEX** (like new or complex feature) and then follow the right workflow.
+
+### Workflow For Simple Changes (like bug fixes or small features)
+1. Identify the issue and affected files
+2. Make a brief plan with the minimal necessary changes
+3. Follow the . Implementation Guidelines of the workflow phases
+4. Follow the 3. Documentation & Knowledge Transfer of the workflow phases
+
+### Workflow For Complex Changes (like complex requirement or new feature)
+Follow each one of the Workflow Phases
+
+## General Guidelines
+
+**IMPORTANT**: The tests should be run by independent sub-agents.
 
 **IMPORTANT**: If you need more information when you are thinking or write code, use context7 to  look for documentation and references.
+
+**IMPORTANT**:  Documentation & Knowledge Transfer task should be run by independent sub-agents.
+
+**REMEMBER**: The goal is to deliver high-quality, maintainable, and secure code. When in doubt, choose the simpler, more explicit solution. Always prioritize code clarity, readability and system stability over cleverness or premature optimization.
+
+**REMEMBER**: Good code is code that another developer (or future you) can understand and modify easily.
+
+### Research Protocol
+
+Use context7 proactively for:
+- API documentation and usage examples
+- Best practices for the technology stack
+- Similar implementations or patterns
+- Known issues, gotchas, or compatibility concerns
+- Performance optimization techniques
+- Security vulnerability databases
+
+### Emergency Protocols
+- If you encounter a critical security issue: **STOP** and report immediately
+- If you discover data corruption risk: **STOP** and create backup plan
+- If performance degradation >50%: Rollback and reassess approach
+
+## API Reference
+
+### Pokemon API
+- Base URL: `https://pokeapi.co/api/v2`
+- Main endpoints:
+  - `/pokemon` - List with pagination
+  - `/pokemon/{id or name}` - Details
+  - `/pokemon-species/{id}` - Species info
+  - `/evolution-chain/{id}` - Evolution data
