@@ -147,12 +147,12 @@ Write tests for:
 - [ ] No eval() or dangerouslySetInnerHTML without sanitization
 - [ ] Review error messages to ensure no sensitive info leakage
 
-### Workflow Phases
+### Development Workflow
 
 #### 1. Analysis & Planning Phase
 - Think harder to analyze the problem/requirement thoroughly by reading all relevant context
 - Review the codebase to identify affected components and dependencies
-- Create a phased implementation plan in `task/phase_{phase_number}_{feature_name}.md`
+- Create a phased implementation plan in `task/{feature_name}.md`
 - Before you begin working, check it with me and I will verify the plan
 
 ##### 1.1 Plan Structure Requirements
@@ -209,7 +209,7 @@ Before marking any phase complete, ensure:
 
 #### 3. Documentation & Knowledge Transfer Phase
 
-Create `task/phase_{phase_number}_{feature_name}_summary.md` containing:
+Create `task/{feature_name}_summary.md` containing:
 
 - Overview: High-level summary of what was built
 - Architecture decisions: Why specific approaches were chosen
@@ -224,19 +224,6 @@ Create `task/phase_{phase_number}_{feature_name}_summary.md` containing:
 - Future considerations: Technical debt, optimization opportunities
 
 Act like you’re a senior engineer teaching me code and add any other relevant information.
-
-### Workflow types
-
-Identify if the work you are going to do is **SIMPLE** (like bug fix or small features/changes) or is **COMPLEX** (like new or complex feature) and then follow the right workflow.
-
-### Workflow For Simple Changes (like bug fixes or small features)
-1. Identify the issue and affected files
-2. Make a brief plan with the minimal necessary changes
-3. Follow the . Implementation Guidelines of the workflow phases
-4. Follow the 3. Documentation & Knowledge Transfer of the workflow phases
-
-### Workflow For Complex Changes (like complex requirement or new feature)
-Follow each one of the Workflow Phases
 
 ## General Guidelines
 

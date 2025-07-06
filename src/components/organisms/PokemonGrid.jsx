@@ -27,7 +27,7 @@ export function PokemonGrid({
     );
   }
 
-  if (pokemons.length === 0) {
+  if (pokemons.length === 0 && !loading) {
     return (
       <div className="w-full flex justify-center">
         <ErrorMessage 

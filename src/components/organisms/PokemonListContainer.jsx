@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePokemonStore } from '../../store/pokemonStore';
 import { fetchPokemons, generateFirstPageUrl, generateLastPageUrl } from '../../service/pokemonService';
@@ -8,6 +8,7 @@ import { PokemonGrid } from './PokemonGrid';
 
 export function PokemonListContainer() {
   const [url, setUrl] = useState('https://pokeapi.co/api/v2/pokemon?offset=0&limit=20');
+  const [isNavigating, setIsNavigating] = useState(false);
   const { 
     pokemons, 
     nextLink, 
@@ -23,6 +24,7 @@ export function PokemonListContainer() {
 
   const handlePrevious = () => {
     if (previousLink) {
+      setIsNavigating(true);
       clearPokemons();
       setUrl(previousLink);
     }
@@ -30,18 +32,21 @@ export function PokemonListContainer() {
 
   const handleNext = () => {
     if (nextLink) {
+      setIsNavigating(true);
       clearPokemons();
       setUrl(nextLink);
     }
   };
 
   const handleFirst = () => {
+    setIsNavigating(true);
     clearPokemons();
     setUrl(generateFirstPageUrl());
   };
 
   const handleLast = () => {
     if (totalCount > 0) {
+      setIsNavigating(true);
       clearPokemons();
       setUrl(generateLastPageUrl(totalCount));
     }
@@ -51,6 +56,12 @@ export function PokemonListContainer() {
     queryKey: ['pokemons', url],
     queryFn: () => fetchPokemons(url, addPokemon, setLinks, setPaginationInfo),
   });
+
+  useEffect(() => {
+    if (!query.isLoading && isNavigating) {
+      setIsNavigating(false);
+    }
+  }, [query.isLoading, isNavigating]);
 
   const handleRetry = () => {
     query.refetch();
@@ -77,7 +88,7 @@ export function PokemonListContainer() {
       
       <PokemonGrid
         pokemons={pokemons}
-        loading={query.isLoading}
+        loading={query.isLoading || isNavigating}
         error={query.error}
         onRetry={handleRetry}
       />
