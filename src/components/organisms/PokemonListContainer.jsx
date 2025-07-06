@@ -1,30 +1,55 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePokemonStore } from '../../store/pokemonStore';
-import { fetchPokemons } from '../../service/pokemonService';
+import { fetchPokemons, generateFirstPageUrl, generateLastPageUrl } from '../../service/pokemonService';
 import { Text } from '../atoms/Text';
 import { PaginationControls } from '../molecules/PaginationControls';
 import { PokemonGrid } from './PokemonGrid';
 
 export function PokemonListContainer() {
   const [url, setUrl] = useState('https://pokeapi.co/api/v2/pokemon?offset=0&limit=20');
-  const { pokemons, nextLink, previousLink, setLinks, addPokemon } = usePokemonStore();
+  const { 
+    pokemons, 
+    nextLink, 
+    previousLink, 
+    currentPage, 
+    totalPages, 
+    totalCount, 
+    setLinks, 
+    setPaginationInfo, 
+    addPokemon,
+    clearPokemons
+  } = usePokemonStore();
 
   const handlePrevious = () => {
     if (previousLink) {
+      clearPokemons();
       setUrl(previousLink);
     }
   };
 
   const handleNext = () => {
     if (nextLink) {
+      clearPokemons();
       setUrl(nextLink);
     }
   };
 
+  const handleFirst = () => {
+    clearPokemons();
+    setUrl(generateFirstPageUrl());
+  };
+
+  const handleLast = () => {
+    if (totalCount > 0) {
+      clearPokemons();
+      setUrl(generateLastPageUrl(totalCount));
+    }
+  };
+
   const query = useQuery({
-    queryKey: ['pokemons'],
-    queryFn: () => fetchPokemons(url, addPokemon, setLinks),
+    queryKey: ['pokemons', url],
+    queryFn: () => fetchPokemons(url, addPokemon, setLinks, setPaginationInfo),
   });
 
   const handleRetry = () => {
@@ -37,12 +62,16 @@ export function PokemonListContainer() {
         Pokémon List
       </Text>
       
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-4xl">
         <PaginationControls
           onPrevious={handlePrevious}
           onNext={handleNext}
+          onFirst={handleFirst}
+          onLast={handleLast}
           hasPrevious={!!previousLink}
           hasNext={!!nextLink}
+          currentPage={currentPage}
+          totalPages={totalPages}
         />
       </div>
       

@@ -1,5 +1,5 @@
 
-export const fetchPokemons = async (url, addPokemon, setLinks) => {
+export const fetchPokemons = async (url, addPokemon, setLinks, setPaginationInfo) => {
     try{
         if(!url) {
             url = "https://pokeapi.co/api/v2/pokemon?offset=0&limit=20";
@@ -14,6 +14,16 @@ export const fetchPokemons = async (url, addPokemon, setLinks) => {
         const previousLink = data.previous;
         const nextLink = data.next;
         setLinks(previousLink, nextLink);
+        
+        // Calculate pagination info
+        const totalCount = data.count;
+        const limit = 20; // Default limit
+        const totalPages = Math.ceil(totalCount / limit);
+        const currentOffset = url.includes('offset=') ? parseInt(url.split('offset=')[1].split('&')[0]) : 0;
+        const currentPage = Math.floor(currentOffset / limit) + 1;
+        
+        setPaginationInfo(currentPage, totalPages, totalCount);
+        
         // Update the Zustand store with the fetched pokemons
         data.results.map(pokemon => {
             const newPokemon = {
@@ -64,3 +74,12 @@ export const fetchPokemonDetails = async (url) => {
         throw error;
     }
 }
+
+export const generateFirstPageUrl = (limit = 20) => {
+    return `https://pokeapi.co/api/v2/pokemon?offset=0&limit=${limit}`;
+};
+
+export const generateLastPageUrl = (totalCount, limit = 20) => {
+    const lastOffset = Math.floor((totalCount - 1) / limit) * limit;
+    return `https://pokeapi.co/api/v2/pokemon?offset=${lastOffset}&limit=${limit}`;
+};

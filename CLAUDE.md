@@ -152,7 +152,7 @@ Write tests for:
 #### 1. Analysis & Planning Phase
 - Think harder to analyze the problem/requirement thoroughly by reading all relevant context
 - Review the codebase to identify affected components and dependencies
-- Create a phased implementation plan in task/{phase_number}_phase.md
+- Create a phased implementation plan in `task/{phase_number}_phase.md`
 - Before you begin working, check it with me and I will verify the plan
 
 ##### 1.1 Plan Structure Requirements
