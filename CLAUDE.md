@@ -248,10 +248,10 @@ Follow each one of the Workflow Phases
 
 **REMEMBER**: The goal is to deliver high-quality, maintainable, and secure code. When in doubt, choose the simpler, more explicit solution. Always prioritize code clarity, readability and system stability over cleverness or premature optimization. Good code is code that another developer (or future you) can understand and modify easily.
 
-**REMEMBER**: Do not forget to:
+**REMEMBER**: Do not forget to create or update the plan and summary files:
 1. After I confirm you the plan, create the related file `task/{feature_name}.md`
-2. Ask me if I want to proceed again
-3. Checks the completed tasks
+2. Ask me if I want to proceed with the implementation again
+3. Marks all the work done in the plan
 4. After the implementation ends, create the file `task/{feature_name}_summmary.md`
 
 ### Research Protocol
