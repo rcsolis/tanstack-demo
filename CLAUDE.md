@@ -152,7 +152,7 @@ Write tests for:
 #### 1. Analysis & Planning Phase
 - Think harder to analyze the problem/requirement thoroughly by reading all relevant context
 - Review the codebase to identify affected components and dependencies
-- Create a phased implementation plan in `task/{phase_number}_phase.md`
+- Create a phased implementation plan in task/phase_{phase_number}_{feature_name}.md
 - Before you begin working, check it with me and I will verify the plan
 
 ##### 1.1 Plan Structure Requirements
@@ -178,7 +178,9 @@ Include:
 - Timeline estimates
 - Resource requirements (sub-agents, external dependencies)
 
-#### 2. Implementation Guidelines
+#### 2. Implementation Phase
+
+##### 2.1 Implementation Guidelines
 - Execute phases sequentially, updating task checkboxes as you progress
 - Parallelize independent tasks using sub-agents when possible
 - If blocked, document the blocker and move to next independent task
@@ -194,7 +196,7 @@ Include:
     - **Impact**: What this enables or fixes
     - **Next steps**: What comes next in the plan
 
-##### 2.1 Quality Gates
+##### 2.2 Quality Gates
 
 Before marking any phase complete, ensure:
 
@@ -205,9 +207,9 @@ Before marking any phase complete, ensure:
 - Performance benchmarks met
 - Stakeholder sign-off obtained
 
-#### 3. Documentation & Knowledge Transfer
+#### 3. Documentation & Knowledge Transfer Phase
 
-Create task/{phase_number}_summary.md containing:
+Create task/phase_{phase_number}_{feature_name}_summary.md containing:
 
 - Overview: High-level summary of what was built
 - Architecture decisions: Why specific approaches were chosen
