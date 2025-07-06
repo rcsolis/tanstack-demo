@@ -152,7 +152,7 @@ Write tests for:
 #### 1. Analysis & Planning Phase
 - Think harder to analyze the problem/requirement thoroughly by reading all relevant context
 - Review the codebase to identify affected components and dependencies
-- Create a phased implementation plan in task/phase_{phase_number}_{feature_name}.md
+- Create a phased implementation plan in `task/phase_{phase_number}_{feature_name}.md`
 - Before you begin working, check it with me and I will verify the plan
 
 ##### 1.1 Plan Structure Requirements
@@ -209,7 +209,7 @@ Before marking any phase complete, ensure:
 
 #### 3. Documentation & Knowledge Transfer Phase
 
-Create task/phase_{phase_number}_{feature_name}_summary.md containing:
+Create `task/phase_{phase_number}_{feature_name}_summary.md` containing:
 
 - Overview: High-level summary of what was built
 - Architecture decisions: Why specific approaches were chosen
